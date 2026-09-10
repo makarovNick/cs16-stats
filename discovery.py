@@ -20,6 +20,7 @@ import socket
 import struct
 import time
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 SOURCES_FILE = os.path.join(BASE, "sources.json")
@@ -64,7 +65,7 @@ def load_sources():
 # ------------------------------------------------------------------ master
 
 def query_master(host, port=27011, region=0xFF, filt=r"\gamedir\cstrike",
-                 limit=5000, timeout=3.0):
+                 limit=5000, timeout=3.0, max_pages=100):
     """Iterative master-server walk: returns a list of 'ip:port'."""
     try:
         addr = (socket.gethostbyname(host), port)
@@ -74,8 +75,10 @@ def query_master(host, port=27011, region=0xFF, filt=r"\gamedir\cstrike",
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(timeout)
     seed, seen, out = "0.0.0.0:0", set(), []
+    pages, stale = 0, 0
     try:
-        while len(out) < limit:
+        while len(out) < limit and pages < max_pages:
+            pages += 1
             pkt = (b"\x31" + bytes([region]) + seed.encode() + b"\x00"
                    + filt.encode() + b"\x00")
             sock.sendto(pkt, addr)
@@ -91,11 +94,19 @@ def query_master(host, port=27011, region=0xFF, filt=r"\gamedir\cstrike",
                 batch.append(f"{ip}:{p}")
             if not batch:
                 break
+            before = len(out)
             for s in batch:
                 if s != "0.0.0.0:0" and s not in seen:
                     seen.add(s)
                     out.append(s)
             if batch[-1] == "0.0.0.0:0":  # end-of-list marker
+                break
+            if batch[-1] == seed:         # master keeps returning the same page — stop
+                break
+            # some masters cycle through the same addresses with a changing seed forever:
+            # three pages in a row without anything new is the end of the useful list
+            stale = stale + 1 if len(out) == before else 0
+            if stale >= 3:
                 break
             seed = batch[-1]
             time.sleep(0.15)  # don't hammer the master
@@ -162,12 +173,16 @@ def collect(region="world", limit=5000, use_masters=True, use_seeds=True,
         log(f"[{tag}] +{added} (total {len(addrs)})")
 
     if use_masters:
-        for m in src.get("masters", []):
-            if not m.get("enabled", True):
-                continue
-            got = query_master(m["host"], m.get("port", 27011),
-                               REGIONS.get(region, 0xFF), limit=limit)
-            add(got, f"master {m['host']}")
+        # masters are independent and mostly slow (0.15 s per page, 3 s timeouts):
+        # query them concurrently, merge in a stable order
+        masters = [m for m in src.get("masters", []) if m.get("enabled", True)]
+        with ThreadPoolExecutor(max_workers=16) as ex:
+            results = ex.map(
+                lambda m: query_master(m["host"], m.get("port", 27011),
+                                       REGIONS.get(region, 0xFF), limit=limit),
+                masters)
+            for m, got in zip(masters, results):
+                add(got, f"master {m['host']}")
 
     if use_seeds:
         add(from_seeds(), "seeds.txt")

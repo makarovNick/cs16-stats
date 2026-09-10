@@ -17,6 +17,11 @@ import os
 import sys
 from concurrent.futures import ThreadPoolExecutor
 
+# Windows consoles default to cp1252 while server names are UTF-8: never crash on print
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(errors="replace")
+
 BASE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE)
 import a2s    # noqa: E402
@@ -112,9 +117,9 @@ def main():
               f"{((r['name'] or '')[:38] + tag):<40} connect {r['addr']}")
 
     if a.save and live:
-        store.upsert_many([{**r, "ip": r["addr"].split(":")[0],
-                            "port": int(r["addr"].split(":")[1]),
-                            "player_list": [], "rules": {}} for r in live])
+        # only the fields measured here; a full upsert_many() would wipe rules,
+        # player_list, vac, environment etc. that the last full scan collected
+        store.update_light(live, real_players=a.confirm)
 
 
 if __name__ == "__main__":

@@ -13,6 +13,11 @@ import json
 import os
 import sys
 
+# Windows consoles default to cp1252 while server names are UTF-8: never crash on print
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(errors="replace")
+
 BASE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE)
 import store  # noqa: E402

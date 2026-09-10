@@ -7,6 +7,7 @@ Options: --host 0.0.0.0 --port 8080 --auto 300  (auto-rescan every 300 sec)
 """
 
 import argparse
+import sys
 import os
 import threading
 import time
@@ -18,6 +19,11 @@ from flask import Flask, jsonify, render_template, request
 import a2s
 import discovery
 import store
+
+# Windows consoles default to cp1252 while server names are UTF-8: never crash on print
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(errors="replace")
 
 app = Flask(__name__)
 
@@ -81,13 +87,23 @@ def run_scan(region="world", limit=3000, threads=128, timeout=1.5,
                         STATE["pirate"] += 1
                     batch.append(r)
                 if len(batch) >= 200:
-                    store.upsert_many(batch)
+                    # geo is resolved once for the whole scan below: a Team Cymru
+                    # round-trip per 200-row batch stalled the flush for seconds
+                    store.upsert_many(batch, with_geo=False)
                     batch = []
                 if STATE["done"] % 250 == 0:
                     log(f"probed {STATE['done']}/{STATE['total']}, "
                         f"alive {STATE['alive']}, pirate {STATE['pirate']}")
         if batch:
-            store.upsert_many(batch)
+            store.upsert_many(batch, with_geo=False)
+
+        STATE.update(phase="geo")
+        try:
+            import geo
+            n = geo.backfill(verbose=False)
+            log(f"[geo] country/ASN filled for {n} rows")
+        except Exception as e:  # noqa: BLE001 — geo.py is optional
+            log(f"[geo] skipped: {type(e).__name__}: {e}")
 
         log(f"=== done: alive {STATE['alive']}, non-Steam {STATE['pirate']} ===")
     except Exception as e:  # the scanner must not crash the web server

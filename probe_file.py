@@ -11,6 +11,11 @@ from concurrent.futures import ThreadPoolExecutor
 sys.path.insert(0, __import__('os').path.dirname(__import__('os').path.abspath(__file__)))
 import a2s
 
+# Windows consoles default to cp1252 while server names are UTF-8: never crash on print
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(errors="replace")
+
 ADDR = re.compile(r"\b((?:\d{1,3}\.){3}\d{1,3}|(?:[a-z0-9][a-z0-9\-]{1,40}\.)+[a-z]{2,6})[:\s]{1,3}(\d{2,5})\b", re.I)
 
 def parse(text):

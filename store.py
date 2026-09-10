@@ -23,14 +23,21 @@ CREATE TABLE IF NOT EXISTS servers (
     country     TEXT, asn TEXT, asn_name TEXT,
     first_seen  TEXT, last_seen TEXT,
     seen_count  INTEGER DEFAULT 0,
-    peak_players INTEGER DEFAULT 0
+    peak_players INTEGER DEFAULT 0,
+    search      TEXT
 );
 CREATE TABLE IF NOT EXISTS samples (
     addr TEXT, ts TEXT, players INTEGER, map TEXT, ping_ms INTEGER
 );
-CREATE INDEX IF NOT EXISTS idx_samples ON samples(addr, ts);
 CREATE INDEX IF NOT EXISTS idx_players ON servers(players DESC);
 CREATE INDEX IF NOT EXISTS idx_srv_cc ON servers(country);
+-- (pirate, players, max_players) covers the "valid + pirate" filter used by every
+-- dashboard query: summary()/query() go from a full table scan to an index range.
+CREATE INDEX IF NOT EXISTS idx_srv_pirate ON servers(pirate, players DESC, max_players);
+-- covering index for the online-history chart: SUM(players) GROUP BY ts never
+-- touches the samples rows themselves (idx_samples(addr, ts) is superseded).
+DROP INDEX IF EXISTS idx_samples;
+CREATE INDEX IF NOT EXISTS idx_samples_cov ON samples(addr, ts, players);
 """
 
 
@@ -41,14 +48,47 @@ def connect():
 
 
 def init():
-    with connect() as con:
-        con.executescript(SCHEMA)
     # old databases: add geo-location columns if they don't exist yet
+    # (before SCHEMA, which creates an index on country)
     with connect() as con:
         cols = {c[1] for c in con.execute("PRAGMA table_info(servers)")}
-        for c in ("country", "asn", "asn_name"):
-            if c not in cols:
-                con.execute(f"ALTER TABLE servers ADD COLUMN {c} TEXT")
+        if cols:
+            for c in ("country", "asn", "asn_name", "search"):
+                if c not in cols:
+                    con.execute(f"ALTER TABLE servers ADD COLUMN {c} TEXT")
+    with connect() as con:
+        con.executescript(SCHEMA)
+        # refresh planner statistics when SQLite thinks they are stale —
+        # without them the history query picks a plan that is ~3x slower
+        con.execute("PRAGMA optimize")
+    _backfill_search()
+
+
+def search_text(name, map_name, addr):
+    """What the dashboard search box matches against: name + map + address, casefolded
+    (so 'душа' finds 'ДУША' — SQLite's own LIKE only folds ASCII)."""
+    return f"{name or ''} {map_name or ''} {addr or ''}".casefold()
+
+
+def _backfill_search():
+    """One-off for databases created before the search column existed."""
+    with _lock, connect() as con:
+        rows = con.execute(
+            "SELECT addr, name, map FROM servers WHERE search IS NULL").fetchall()
+        if rows:
+            con.executemany(
+                "UPDATE servers SET search=? WHERE addr=?",
+                [(search_text(r["name"], r["map"], r["addr"]), r["addr"]) for r in rows])
+
+
+def _like_clauses(q, column="search"):
+    """'surf dust' -> every word must occur (AND), % and _ in the input are literal."""
+    sql, args = [], []
+    for tok in q.casefold().split():
+        esc = tok.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        sql.append(f" AND {column} LIKE ? ESCAPE '\\'")
+        args.append(f"%{esc}%")
+    return "".join(sql), args
 
 
 def upsert_many(rows, with_geo=True):
@@ -74,10 +114,11 @@ def upsert_many(rows, with_geo=True):
                     max_players, bots, password, vac, pirate, ping_ms,
                     environment, proto_kind, rules, player_list,
                     real_players, fake_online, country, asn, asn_name,
-                    first_seen, last_seen, seen_count, peak_players)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,?)
+                    first_seen, last_seen, seen_count, peak_players, search)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,?,?)
                 ON CONFLICT(addr) DO UPDATE SET
                     name=excluded.name, map=excluded.map, game=excluded.game,
+                    search=excluded.search,
                     real_players=excluded.real_players, fake_online=excluded.fake_online,
                     players=excluded.players, max_players=excluded.max_players,
                     bots=excluded.bots, password=excluded.password,
@@ -104,12 +145,39 @@ def upsert_many(rows, with_geo=True):
                  int(bool(r.get("player_list")) and
                      len(r["player_list"]) < r.get("players", 0) * 0.6),
                  g.get("country"), g.get("asn"), g.get("asn_name"),
-                 now, now, r.get("players", 0)),
+                 now, now, r.get("players", 0),
+                 search_text(r.get("name"), r.get("map"), r["addr"])),
             )
             con.execute(
                 "INSERT INTO samples (addr, ts, players, map, ping_ms) VALUES (?,?,?,?,?)",
                 (r["addr"], now, r.get("players", 0), r.get("map"), r.get("ping_ms")),
             )
+
+
+def update_light(rows, real_players=False):
+    """Refresh only what a bare A2S_INFO poll knows (name, map, players, ping) for
+    servers that already exist in the DB, plus a history sample. Unlike upsert_many()
+    it leaves rules/player_list/vac/environment/geo from the last full scan intact.
+    real_players=True — the rows also carry a freshly counted real_players.
+    """
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    extra = ", real_players=?" if real_players else ""
+    with _lock, connect() as con:
+        con.executemany(
+            f"""UPDATE servers SET name=?, map=?, players=?, max_players=?, ping_ms=?,
+                    last_seen=?, seen_count=seen_count + 1,
+                    peak_players=MAX(peak_players, ?), search=?{extra}
+                WHERE addr=?""",
+            [(r.get("name"), r.get("map"), r.get("players", 0), r.get("max_players", 0),
+              r.get("ping_ms"), now, r.get("players", 0),
+              search_text(r.get("name"), r.get("map"), r["addr"]))
+             + ((r.get("real_players") or 0,) if real_players else ())
+             + (r["addr"],) for r in rows],
+        )
+        con.executemany(
+            "INSERT INTO samples (addr, ts, players, map, ping_ms) VALUES (?,?,?,?,?)",
+            [(r["addr"], now, r.get("players", 0), r.get("map"), r.get("ping_ms")) for r in rows],
+        )
 
 
 def query(only_pirate=True, q="", map_name="", min_players=0, non_empty=False,
@@ -132,12 +200,14 @@ def query(only_pirate=True, q="", map_name="", min_players=0, non_empty=False,
         sql += " AND real_players > 0"
     if only_pirate:
         sql += " AND pirate=1"
-    if q:
-        sql += " AND (name LIKE ? OR addr LIKE ?)"
-        args += [f"%{q}%", f"%{q}%"]
-    if map_name:
-        sql += " AND map = ?"
-        args.append(map_name)
+    if q:                     # any words, in any order, over name + map + address
+        part, a = _like_clauses(q)
+        sql += part
+        args += a
+    if map_name:              # substring: "surf" finds surf_ski_2, "dust" both dusts
+        part, a = _like_clauses(map_name, column="map")
+        sql += part
+        args += a
     if min_players:
         sql += " AND players >= ?"
         args.append(int(min_players))

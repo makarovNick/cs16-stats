@@ -28,6 +28,11 @@ import threading
 import time
 from datetime import datetime, timezone
 
+# Windows consoles default to cp1252 while server names are UTF-8: never crash on print
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(errors="replace")
+
 BASE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE)
 
@@ -173,6 +178,7 @@ def main():
     ap.add_argument("--db", action="store_true", help="append what was found to cs16.db")
     a = ap.parse_args()
 
+    custom = [int(x) for x in a.ports.split(",")] if a.ports else None
     if a.targets_file:
         pairs = [(x.split(":")[0], int(x.split(":")[1]))
                  for x in read_addrs_file(a.targets_file)]
@@ -181,17 +187,7 @@ def main():
         def targets():
             return iter(pairs)
 
-        t0 = time.time()
-        sw = Sweeper(pps=a.pps)
-        found = sw.run(targets, rounds=a.rounds)
-        print(f"SENT {sw.sent}, REPLIES {sw.replies}", file=sys.stderr)
-        print(f"SERVERS FOUND: {len(found)} in {time.time()-t0:.0f} sec", file=sys.stderr)
-        with open(os.path.join(BASE, a.out), "w", encoding="utf-8") as f:
-            f.write(chr(10).join(sorted(found)) + chr(10))
-        print(f"saved to {a.out}", file=sys.stderr)
-        return
-
-    if a.nets_file:
+    elif a.nets_file:
         nets = [l.strip() for l in open(a.nets_file, encoding="utf-8") if l.strip()]
         known = []
     elif a.nets:
@@ -199,11 +195,12 @@ def main():
     else:
         known = read_addrs_db() if a.from_db else read_addrs_file(a.from_file)
         nets = nets_from_addrs(known, a.prefix)
-    if a.max_nets:
+    if not a.targets_file and a.max_nets:
         nets = nets[:a.max_nets]
 
-    custom = [int(x) for x in a.ports.split(",")] if a.ports else None
-    if a.anchors:
+    if a.targets_file:
+        pass
+    elif a.anchors:
         ports = custom or ANCHOR_PORTS
         total = len(nets) * (2 ** (32 - a.prefix)) * len(ports)
         print(f"phase A: {len(nets)} subnets /{a.prefix} x {len(ports)} ports = {total} targets",

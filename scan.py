@@ -19,6 +19,11 @@ import a2s
 import discovery
 import store
 
+# Windows consoles default to cp1252 while server names are UTF-8: never crash on print
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(errors="replace")
+
 
 def main():
     p = argparse.ArgumentParser(description="CS 1.6 server scanner (non-Steam)")
