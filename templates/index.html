@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS 1.6 — non-Steam Server Monitor</title>
+<style>
+  :root{
+    --bg:#0f1216; --panel:#161b22; --panel2:#1c232c; --line:#2a323d;
+    --txt:#e6edf3; --dim:#8b98a5; --acc:#ffb545; --ok:#4ec9a0; --bad:#e5534b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+       font:14px/1.45 "Segoe UI",system-ui,sans-serif}
+  header{display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+         padding:14px 20px;background:var(--panel);border-bottom:1px solid var(--line)}
+  h1{font-size:17px;margin:0;letter-spacing:.5px}
+  h1 span{color:var(--acc)}
+  .wrap{padding:18px 20px;max-width:1500px;margin:0 auto}
+  button{background:var(--acc);color:#1a1206;border:0;border-radius:6px;
+         padding:8px 14px;font-weight:600;cursor:pointer}
+  button.ghost{background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  input,select,textarea{background:var(--panel2);color:var(--txt);
+         border:1px solid var(--line);border-radius:6px;padding:7px 9px;font:inherit}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+         gap:12px;margin-bottom:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .card b{display:block;font-size:26px;line-height:1.2}
+  .card small{color:var(--dim);text-transform:uppercase;font-size:11px;letter-spacing:.6px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  label.chk{display:flex;gap:6px;align-items:center;color:var(--dim);cursor:pointer}
+  table{width:100%;border-collapse:collapse;background:var(--panel);
+        border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  th{background:var(--panel2);color:var(--dim);font-size:12px;
+     text-transform:uppercase;letter-spacing:.5px}
+  tr.srv{cursor:pointer}
+  tr.srv:hover td{background:#1b222b}
+  .nm{max-width:420px}
+  .bar{height:5px;background:#2a323d;border-radius:3px;margin-top:4px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--ok)}
+  .pill{font-size:11px;padding:1px 6px;border-radius:20px;border:1px solid var(--line);color:var(--dim)}
+  .lock{color:var(--bad)}
+  .det{background:#11161c}
+  .det td{white-space:normal;padding:12px 16px}
+  .plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 14px}
+  .plist div{display:flex;justify-content:space-between;border-bottom:1px dotted var(--line);padding:2px 0}
+  .rules{color:var(--dim);font-size:12px;margin-top:10px;word-break:break-all}
+  #log{background:#0b0e12;border:1px solid var(--line);border-radius:8px;
+       padding:10px;height:130px;overflow:auto;font:12px/1.5 Consolas,monospace;
+       color:var(--dim);white-space:pre-wrap;margin-top:14px}
+  .maps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .maps span{background:var(--panel);border:1px solid var(--line);border-radius:20px;
+             padding:3px 10px;font-size:12px;cursor:pointer}
+  .maps span b{color:var(--acc)}
+  dialog{background:var(--panel);color:var(--txt);border:1px solid var(--line);
+         border-radius:10px;width:min(620px,92vw)}
+  dialog textarea{width:100%;height:240px;font:12px/1.5 Consolas,monospace}
+</style>
+</head>
+<body>
+<header>
+  <h1>CS 1.6 <span>non-Steam</span> monitor</h1>
+  <button id="scan">Scan</button>
+  <button class="ghost" id="seedsBtn">Seeds</button>
+  <select id="region">
+    <option value="world">worldwide</option><option value="eu">Europe</option>
+    <option value="asia">Asia</option><option value="us-east">US-East</option>
+    <option value="us-west">US-West</option><option value="sa">S. America</option>
+  </select>
+  <label class="chk"><input type="checkbox" id="pirate" checked> non-Steam only</label>
+  <span id="prog" style="color:var(--dim)"></span>
+</header>
+
+<div class="wrap">
+  <div class="cards" id="cards"></div>
+  <div class="maps" id="maps"></div>
+
+  <div class="row">
+    <input id="q" placeholder="search by name or ip…" style="min-width:260px">
+    <input id="map" placeholder="map (de_dust2)" style="width:150px">
+    <input id="minp" type="number" min="0" placeholder="players ≥" style="width:110px">
+    <select id="sort">
+      <option value="players">by online</option>
+      <option value="real">by confirmed players</option>
+      <option value="peak">by peak</option>
+      <option value="ping">by ping</option>
+      <option value="slots">by slots</option>
+      <option value="name">by name</option>
+    </select>
+    <label class="chk"><input type="checkbox" id="nonempty"> non-empty</label>
+    <label class="chk"><input type="checkbox" id="nopass"> no password</label>
+    <label class="chk"><input type="checkbox" id="confirmed"> online confirmed</label>
+    <button class="ghost" id="refresh">Refresh</button>
+    <span style="color:var(--dim)" id="cnt"></span>
+  </div>
+
+  <table>
+    <thead><tr>
+      <th style="width:70px">Players</th><th class="nm">Name</th>
+      <th style="width:130px">Map</th><th style="width:160px">Address</th>
+      <th style="width:90px">Conf.</th><th style="width:70px">Ping</th>
+      <th style="width:90px">Type</th>
+    </tr></thead>
+    <tbody id="tb"></tbody>
+  </table>
+
+  <div id="log"></div>
+</div>
+
+<dialog id="seedsDlg">
+  <h3 style="margin:14px 16px">seeds.txt — your addresses (ip:port, one per line)</h3>
+  <div style="padding:0 16px 16px">
+    <textarea id="seedsTxt" placeholder="46.174.50.30:27015&#10;93.115.24.11:27017  # my server"></textarea>
+    <div class="row" style="margin:12px 0 0">
+      <button id="seedsSave">Save</button>
+      <button class="ghost" onclick="seedsDlg.close()">Close</button>
+      <span id="seedsMsg" style="color:var(--dim)"></span>
+    </div>
+  </div>
+</dialog>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => (s ?? "").toString().replace(/[<>&"]/g, c =>
+  ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const hhmm = s => { s = Math.round(s||0);
+  return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; };
+
+function params(){
+  const p = new URLSearchParams({
+    pirate: $('#pirate').checked ? 1 : 0,
+    q: $('#q').value, map: $('#map').value,
+    min_players: $('#minp').value || 0,
+    non_empty: $('#nonempty').checked ? 1 : 0,
+    no_password: $('#nopass').checked ? 1 : 0,
+    confirmed: $('#confirmed').checked ? 1 : 0,
+    sort: $('#sort').value, limit: 400
+  });
+  return p.toString();
+}
+
+async function loadServers(){
+  const r = await (await fetch('/api/servers?' + params())).json();
+  $('#cnt').textContent = `found: ${r.count}`;
+  $('#tb').innerHTML = r.servers.map((s,i) => {
+    const pct = s.max_players ? Math.round(s.players/s.max_players*100) : 0;
+    return `<tr class="srv" data-i="${i}">
+      <td>${s.players}/${s.max_players}
+        <div class="bar"><i style="width:${pct}%"></i></div></td>
+      <td class="nm" title="${esc(s.name)}">${s.password?'<span class="lock">🔒 </span>':''}${esc(s.name)}</td>
+      <td>${esc(s.map)}</td><td>${esc(s.addr)}</td>
+      <td>${s.real_players ?? 0}${s.real_players ? '' : ' <span style="color:var(--dim)">—</span>'}</td>
+      <td>${s.ping_ms ?? '—'} ms</td>
+      <td><span class="pill">${s.pirate ? 'non-Steam' : 'Steam'}</span></td>
+    </tr><tr class="det" id="d${i}" hidden><td colspan="7"></td></tr>`;
+  }).join('') || '<tr><td colspan="7" style="color:var(--dim)">empty — run a scan or add seeds</td></tr>';
+
+  $('#tb').querySelectorAll('tr.srv').forEach(tr => tr.onclick = () => {
+    const s = r.servers[tr.dataset.i], d = $('#d' + tr.dataset.i);
+    if (!d.hidden) { d.hidden = true; return; }
+    const pl = s.player_list.length
+      ? `<div class="plist">${s.player_list.map(p =>
+          `<div><span>${esc(p.name)||'&lt;no nickname&gt;'}</span>
+           <span style="color:var(--dim)">${p.score} · ${hhmm(p.time_sec)}</span></div>`).join('')}</div>`
+      : '<span style="color:var(--dim)">no players or the server hides the list</span>';
+    const rl = Object.entries(s.rules||{}).slice(0,40)
+      .map(([k,v]) => `${esc(k)}=${esc(v)}`).join(' · ');
+    d.querySelector('td').innerHTML =
+      `<b>${esc(s.name)}</b> — ${esc(s.addr)} · ${esc(s.game)} · protocol '${esc(s.proto_kind)}'
+       · first seen ${esc(s.first_seen)} · probes ${s.seen_count}
+       <button class="ghost" style="margin-left:10px" onclick="event.stopPropagation();reprobe('${s.addr}')">refresh</button>
+       <div style="margin-top:10px">${pl}</div>
+       ${rl ? `<div class="rules">${rl}</div>` : ''}`;
+    d.hidden = false;
+  });
+}
+
+async function reprobe(addr){
+  const r = await (await fetch('/api/server/' + addr)).json();
+  if (!r.ok) return alert('server did not respond');
+  loadServers();
+}
+
+async function loadSummary(){
+  const s = await (await fetch('/api/summary?pirate=' + ($('#pirate').checked?1:0))).json();
+  const fill = s.slots ? (s.online/s.slots*100).toFixed(1) : 0;
+  $('#cards').innerHTML = `
+    <div class="card"><small>servers</small><b>${s.total}</b></div>
+    <div class="card"><small>players online</small><b>${s.online}</b></div>
+    <div class="card"><small>slots</small><b>${s.slots}</b></div>
+    <div class="card"><small>fill rate</small><b>${fill}%</b></div>
+    <div class="card"><small>online confirmed</small><b>${s.real_online ?? 0}</b></div>
+    <div class="card"><small>non-empty</small><b>${s.active}</b></div>
+    <div class="card"><small>password-protected</small><b>${s.locked}</b></div>`;
+  $('#maps').innerHTML = s.maps.filter(m=>m.map).map(m =>
+    `<span onclick="$('#map').value='${esc(m.map)}';loadServers()">
+       ${esc(m.map)} <b>${m.ppl}</b><span style="color:var(--dim)"> / ${m.srv}</span></span>`).join('');
+}
+
+async function poll(){
+  const s = await (await fetch('/api/status')).json();
+  $('#scan').disabled = s.running;
+  $('#prog').textContent = s.running
+    ? `${s.phase}: ${s.done}/${s.total} · alive ${s.alive} · non-Steam ${s.pirate}`
+    : (s.finished ? 'last scan: ' + s.finished : '');
+  $('#log').textContent = s.log.join('\n');
+  $('#log').scrollTop = 1e9;
+  if (!s.running && poll.was) { loadServers(); loadSummary(); }
+  poll.was = s.running;
+}
+
+$('#scan').onclick = async () => {
+  await fetch('/api/scan', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({region: $('#region').value, limit: 3000})});
+  poll.was = true; poll();
+};
+$('#refresh').onclick = () => { loadServers(); loadSummary(); };
+['q','map','minp'].forEach(id => $('#'+id).oninput = debounce(loadServers, 350));
+['sort','nonempty','nopass','confirmed'].forEach(id => $('#'+id).onchange = loadServers);
+$('#pirate').onchange = () => { loadServers(); loadSummary(); };
+
+$('#seedsBtn').onclick = async () => {
+  $('#seedsTxt').value = (await (await fetch('/api/seeds')).json()).text;
+  seedsDlg.showModal();
+};
+$('#seedsSave').onclick = async () => {
+  const r = await (await fetch('/api/seeds', {method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({text: $('#seedsTxt').value})})).json();
+  $('#seedsMsg').textContent = `saved, addresses parsed: ${r.parsed}`;
+};
+
+function debounce(fn, ms){ let t; return (...a) => { clearTimeout(t);
+  t = setTimeout(() => fn(...a), ms); }; }
+
+loadServers(); loadSummary(); poll(); setInterval(poll, 1500);
+</script>
+</body>
+</html>

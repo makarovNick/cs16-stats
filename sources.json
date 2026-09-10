@@ -1,0 +1,384 @@
+{
+  "masters": [
+    {
+      "host": "ms1.cs-exes.ru",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 506 addresses when checked"
+    },
+    {
+      "host": "ms2.cs-exes.ru",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 506 addresses when checked"
+    },
+    {
+      "host": "88.86.115.150",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 231 addresses when checked"
+    },
+    {
+      "host": "88.86.115.151",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 231 addresses when checked"
+    },
+    {
+      "host": "ms.cs-all-servers.ru",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 230 addresses when checked"
+    },
+    {
+      "host": "ms.ukraina-in-cs.com.ua",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 230 addresses when checked"
+    },
+    {
+      "host": "ms2.cs-all-servers.ru",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 230 addresses when checked"
+    },
+    {
+      "host": "88.218.206.151",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 209 addresses when checked"
+    },
+    {
+      "host": "master1.cs16.net",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 209 addresses when checked"
+    },
+    {
+      "host": "ms.cs16.net",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 209 addresses when checked"
+    },
+    {
+      "host": "cs.hlmasterserver.net",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 202 addresses when checked"
+    },
+    {
+      "host": "134.175.136.113",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 202 addresses when checked"
+    },
+    {
+      "host": "ms.servers-monitoring.ru",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 201 addresses when checked"
+    },
+    {
+      "host": "servers-monitoring.ru",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 201 addresses when checked"
+    },
+    {
+      "host": "188.242.229.252",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "176.117.235.200",
+      "port": 27015,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "176.117.235.200",
+      "port": 27013,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "176.117.235.200",
+      "port": 27009,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "176.117.235.200",
+      "port": 27011,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "176.117.235.200",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "176.117.235.200",
+      "port": 27012,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "143.0.0.127",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "51.38.65.66",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "95.163.78.25",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "95.163.78.25",
+      "port": 27011,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "90.188.250.14",
+      "port": 27013,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "90.188.250.14",
+      "port": 27015,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "90.188.250.14",
+      "port": 27009,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "90.188.250.14",
+      "port": 27011,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "90.188.250.14",
+      "port": 27012,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "90.188.250.14",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "australia.rubitnet.ru",
+      "port": 27009,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "csntul.ru",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "ds-servers.com",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "irkgamerus.sytes.net",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "irkgamerus.sytes.net",
+      "port": 27012,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "irkgamerus.sytes.net",
+      "port": 27013,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "irkgamerus.sytes.net",
+      "port": 27009,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "m.gamecs.com.br",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "ms.allcs.ru",
+      "port": 27011,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "ms.allcs.ru",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "monitoring.rubitnet.ru",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "ms.ap-game.ru",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "ms.cs-booster.ru",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "ms.csntul.ru",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "irkgamerus.sytes.net",
+      "port": 27011,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "ms.topms.ru",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "ms.turbo-cs.com",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "ms.tsarvar.com",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "ms.tsarvar.com",
+      "port": 27011,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "ms.tvar.me",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "ms.tvar.me",
+      "port": 27011,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "ms1.csntul.ru",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "ms1.vipboost.ru",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "ms3.ip-games.ru",
+      "port": 27011,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "ms3.ip-games.ru",
+      "port": 27010,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "setti.rubitnet.ru",
+      "port": 27012,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "rubitnet.ru",
+      "port": 27011,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "rubitnet.ru",
+      "port": 27012,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "rubitnet.ru",
+      "port": 27009,
+      "enabled": true,
+      "note": "UDP master for non-Steam builds, returned 200 addresses when checked"
+    },
+    {
+      "host": "hl1master.steampowered.com",
+      "port": 27011,
+      "enabled": true,
+      "note": "historical GoldSrc master; as of 2026 DNS may not resolve"
+    },
+    {
+      "host": "hl2master.steampowered.com",
+      "port": 27011,
+      "enabled": true,
+      "note": "backup Valve master"
+    }
+  ],
+  "urls": [],
+  "_note": "Pirate servers are rarely present in the Valve master. Working sources for them: (1) seeds.txt with your own addresses; (2) urls - links to any monitorings/APIs from which ip:port is extracted with a regex; (3) masters - masters of non-Steam builds; if you know their host:port, add them here.",
+  "gms_note": "The CSPro client (pirate) does not use the Valve UDP master: it sends POST / HTTP/1.1 to mscf1.cs-css.com:8880 (backups mscf2/mscf3.cs-css.com:8880) with User-Agent 'Valve/Steam HTTP Client 1.0'; the body is compressed+serialized (GSM_PACKET_COMPRESSED|SERIALIZED), the format is closed. It can be bypassed via harvest_client.py - it reads the already-received list directly from the memory of the running game.",
+  "gms_hosts_observed": [
+    "mscf1.cs-css.com:8880",
+    "mscf2.cs-css.com:8880",
+    "mscf3.cs-css.com:8880"
+  ]
+}

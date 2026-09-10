@@ -1,0 +1,479 @@
+{
+  "total_valid": 112185,
+  "total_raw": 122371,
+  "online_claimed": 1489381,
+  "online_confirmed": 820208,
+  "slots": 5313998,
+  "active": 108090,
+  "empty": 4095,
+  "locked": 453,
+  "pirate_count": 6178,
+  "pirate_online": 141747,
+  "unique_ips": 3738,
+  "unique_nets": 1705,
+  "unique_ip_name": 45185,
+  "farm_ips": 205,
+  "servers_on_farms": 105708,
+  "servers_off_farms": 6477,
+  "ips_off_farms": 3533,
+  "online_off_farm_claimed": 39462,
+  "online_off_farm_confirmed": 36641,
+  "online_farm_claimed": 1449919,
+  "top_maps": [
+    [
+      "de_dust2",
+      355652
+    ],
+    [
+      "de_inferno",
+      102417
+    ],
+    [
+      "de_dust",
+      80243
+    ],
+    [
+      "cs_deagle",
+      73684
+    ],
+    [
+      "fy_snow",
+      71960
+    ],
+    [
+      "awp_india",
+      69189
+    ],
+    [
+      "de_tuscan32",
+      57625
+    ],
+    [
+      "de_dust2\r",
+      20391
+    ],
+    [
+      "de_nuke",
+      20226
+    ],
+    [
+      "de_train",
+      18271
+    ],
+    [
+      "de_dust2_2x2",
+      13897
+    ],
+    [
+      "de_aztec",
+      12101
+    ],
+    [
+      "$2000$",
+      11780
+    ],
+    [
+      "de_inferno\r",
+      9572
+    ],
+    [
+      "de_mirage",
+      8585
+    ]
+  ],
+  "top_map_servers": [
+    [
+      "de_dust2",
+      17051
+    ],
+    [
+      "de_inferno",
+      5233
+    ],
+    [
+      "de_dust",
+      4102
+    ],
+    [
+      "fy_snow",
+      3739
+    ],
+    [
+      "awp_india",
+      3600
+    ],
+    [
+      "cs_deagle",
+      3362
+    ],
+    [
+      "de_tuscan32",
+      2979
+    ],
+    [
+      "de_nuke",
+      1364
+    ],
+    [
+      "de_train",
+      1250
+    ],
+    [
+      "de_aztec",
+      1039
+    ],
+    [
+      "de_dust2_2x2",
+      976
+    ],
+    [
+      "de_mirage",
+      724
+    ],
+    [
+      "cs_assault",
+      722
+    ],
+    [
+      "cs_office",
+      676
+    ],
+    [
+      "$2000$",
+      674
+    ]
+  ],
+  "top_nets": [
+    [
+      "5.188.190.0/24",
+      7107
+    ],
+    [
+      "38.54.105.0/24",
+      6899
+    ],
+    [
+      "5.188.183.0/24",
+      6606
+    ],
+    [
+      "37.139.51.0/24",
+      5496
+    ],
+    [
+      "38.54.45.0/24",
+      5486
+    ],
+    [
+      "5.252.24.0/24",
+      5309
+    ],
+    [
+      "2.56.88.0/24",
+      4182
+    ],
+    [
+      "38.54.57.0/24",
+      3665
+    ],
+    [
+      "5.8.64.0/24",
+      3413
+    ],
+    [
+      "38.54.27.0/24",
+      1983
+    ],
+    [
+      "95.170.124.0/24",
+      1906
+    ],
+    [
+      "130.94.113.0/24",
+      1773
+    ],
+    [
+      "130.94.107.0/24",
+      1758
+    ],
+    [
+      "2.56.89.0/24",
+      1657
+    ],
+    [
+      "87.121.99.0/24",
+      1385
+    ]
+  ],
+  "top_ips": [
+    [
+      "5.135.108.221",
+      1160
+    ],
+    [
+      "5.188.190.243",
+      1076
+    ],
+    [
+      "5.188.190.166",
+      1072
+    ],
+    [
+      "5.188.190.139",
+      1068
+    ],
+    [
+      "38.54.105.8",
+      1060
+    ],
+    [
+      "5.188.183.168",
+      1053
+    ],
+    [
+      "5.188.183.234",
+      1047
+    ],
+    [
+      "5.188.183.163",
+      1046
+    ],
+    [
+      "5.188.183.50",
+      1045
+    ],
+    [
+      "5.188.183.147",
+      1043
+    ]
+  ],
+  "top_ports": [
+    [
+      27015,
+      2833
+    ],
+    [
+      27016,
+      581
+    ],
+    [
+      27017,
+      413
+    ],
+    [
+      27020,
+      378
+    ],
+    [
+      27018,
+      332
+    ],
+    [
+      27019,
+      270
+    ],
+    [
+      27025,
+      235
+    ],
+    [
+      27021,
+      233
+    ],
+    [
+      27030,
+      217
+    ],
+    [
+      27050,
+      211
+    ],
+    [
+      27022,
+      202
+    ],
+    [
+      27023,
+      195
+    ]
+  ],
+  "os": {
+    "l": 108859,
+    "w": 776,
+    "L": 11,
+    "\u0000": 2539
+  },
+  "top_brands": [
+    [
+      "DUST2",
+      6066
+    ],
+    [
+      "PUBLIC",
+      4137
+    ],
+    [
+      "CLASSIC",
+      3968
+    ],
+    [
+      "ROMANIA.FULLBOOST.RO",
+      3929
+    ],
+    [
+      "ZOMBIE",
+      3712
+    ],
+    [
+      "PLAY",
+      2928
+    ],
+    [
+      "DEATHMATCH",
+      2473
+    ],
+    [
+      "GUNGAME",
+      2382
+    ],
+    [
+      "SCHOOL",
+      1551
+    ],
+    [
+      "CS16",
+      1378
+    ],
+    [
+      "?",
+      1349
+    ],
+    [
+      "JAILBREAK",
+      1225
+    ],
+    [
+      "SURF",
+      1054
+    ],
+    [
+      "FREE",
+      810
+    ],
+    [
+      "BEST",
+      797
+    ],
+    [
+      "DEATHRUN",
+      759
+    ],
+    [
+      "FULL",
+      718
+    ],
+    [
+      "FAST",
+      716
+    ],
+    [
+      "FRAG",
+      708
+    ],
+    [
+      "ENTER",
+      707
+    ]
+  ],
+  "fakecheck": {
+    "real": 303,
+    "unknown": 8,
+    "fake": 56,
+    "suspect": 33,
+    "sample": 400
+  },
+  "unique_names": 13622,
+  "cloned_servers": 96172,
+  "top_clones": [
+    [
+      "ROMANIA.FULLBOOST.RO V.I.P FREE",
+      3929
+    ],
+    [
+      "CS 1.6 CLASSIC | 1000 FPS | 24/7",
+      712
+    ],
+    [
+      "DUST2 ARENA | SKINS + FREE VIP",
+      711
+    ],
+    [
+      "FAST ROUNDS | DUST2 NON-STOP",
+      710
+    ],
+    [
+      "PLAY HARD | RANK UP | HAVE FUN",
+      709
+    ],
+    [
+      "FULL ACTION | INSTANT CONNECT",
+      708
+    ],
+    [
+      "THE BEST DUST2 EXPERIENCE | 1000 FPS",
+      707
+    ],
+    [
+      "CLASSIC ACTION | SKINS + RANK",
+      707
+    ],
+    [
+      "ENTER THE GAME | CLIMB THE RANK",
+      707
+    ],
+    [
+      "DUST2 24/7 | FREE VIP | FAST GAMEPLAY",
+      706
+    ],
+    [
+      "CLASSIC CS 1.6 | SKINS + RANK",
+      706
+    ],
+    [
+      "CLASSIC BATTLES | FAST ROUNDS",
+      706
+    ],
+    [
+      "PURE CLASSIC GAMEPLAY | NO MODS",
+      705
+    ],
+    [
+      "FREE VIP | SKINS | RANK | DUST2",
+      705
+    ],
+    [
+      "OLD SCHOOL ACTION | NEW CHALLENGES",
+      704
+    ],
+    [
+      "JOIN, PLAY, DOMINATE",
+      704
+    ],
+    [
+      "NO RULES, JUST SKILL | 1000 FPS",
+      704
+    ],
+    [
+      "PLAY NOW | YOUR TEAM NEEDS YOU",
+      704
+    ],
+    [
+      "PUBLIC ARENA | FREE VIP + SKINS",
+      703
+    ],
+    [
+      "PLAY DUST2 | EARN RANK | GET VIP",
+      703
+    ]
+  ]
+}

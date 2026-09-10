@@ -1,0 +1,343 @@
+<title>CS 1.6 Server Census</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --ground:#efe9dc; --panel:#fbf8f1; --panel2:#f3eee2;
+    --ink:#20242a; --dim:#6b7078; --line:#ddd5c4;
+    --sand:#c07d1f; --sand-soft:#e0a548;
+    --real:#2f8f5b; --fake:#c2413c; --suspect:#b98a1e;
+    --grid:#e3dccd;
+    --shadow:0 1px 2px rgba(40,30,10,.06),0 8px 24px rgba(40,30,10,.05);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1015; --panel:#151a21; --panel2:#1b212a;
+      --ink:#e7e3d8; --dim:#8b94a0; --line:#28303b;
+      --sand:#e0a548; --sand-soft:#e0a548;
+      --real:#5bbf8f; --fake:#e0645f; --suspect:#d6a63a;
+      --grid:#222a34;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1015; --panel:#151a21; --panel2:#1b212a;
+    --ink:#e7e3d8; --dim:#8b94a0; --line:#28303b;
+    --sand:#e0a548; --sand-soft:#e0a548;
+    --real:#5bbf8f; --fake:#e0645f; --suspect:#d6a63a;
+    --grid:#222a34;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);
+       font-family:"IBM Plex Sans",system-ui,sans-serif;line-height:1.55;
+       -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  h1,h2,h3{font-family:"Oswald",sans-serif;text-wrap:balance;margin:0}
+
+  /* ---- hero ---- */
+  header{border-bottom:1px solid var(--line);padding:54px 0 40px}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.28em;
+           text-transform:uppercase;color:var(--sand);margin-bottom:18px}
+  h1{font-size:clamp(38px,6.5vw,74px);font-weight:700;line-height:.98;
+     letter-spacing:-.01em;text-transform:uppercase}
+  h1 .thin{font-weight:400;color:var(--dim);display:block;font-size:.42em;
+           letter-spacing:.02em;text-transform:none;margin-top:14px;font-family:"IBM Plex Sans",sans-serif;line-height:1.45}
+  .lede{max-width:60ch;margin-top:22px;color:var(--dim);font-size:16px}
+  .lede b{color:var(--ink);font-weight:600}
+
+  /* ---- section frame ---- */
+  section{padding:44px 0;border-bottom:1px solid var(--line)}
+  .kicker{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.22em;
+          text-transform:uppercase;color:var(--sand);margin-bottom:8px}
+  h2{font-size:clamp(24px,3.4vw,34px);font-weight:600;text-transform:uppercase;
+     letter-spacing:.01em}
+  .sub{color:var(--dim);max-width:64ch;margin-top:10px;font-size:15px}
+
+  /* ---- tiles ---- */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:26px}
+  .tile{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+        padding:18px 18px 16px;box-shadow:var(--shadow)}
+  .tile .n{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:30px;
+           line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .tile .l{color:var(--dim);font-size:12.5px;margin-top:9px;text-transform:uppercase;letter-spacing:.05em}
+  .tile.hot .n{color:var(--sand)}
+  .tile.good .n{color:var(--real)}
+  .tile.bad .n{color:var(--fake)}
+
+  /* ---- funnel ---- */
+  .funnel{margin-top:26px;display:flex;flex-direction:column;gap:9px}
+  .frow{display:grid;grid-template-columns:210px 1fr;gap:16px;align-items:center}
+  .frow .cap{font-size:13.5px;text-align:right;color:var(--dim)}
+  .frow .cap b{color:var(--ink);font-weight:600}
+  .bar{position:relative;height:38px;background:var(--panel2);border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+  .bar>i{position:absolute;inset:0 auto 0 0;border-radius:5px;display:flex;align-items:center;
+         padding-left:12px;color:#fff;font-family:"IBM Plex Mono",monospace;font-weight:600;
+         font-size:13.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  @media (max-width:640px){.frow{grid-template-columns:1fr}.frow .cap{text-align:left}}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:26px}
+  @media (max-width:760px){.grid2{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+        padding:20px;box-shadow:var(--shadow)}
+  .card h3{font-size:15px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-weight:600}
+  .card .note{color:var(--dim);font-size:13px;margin-bottom:14px}
+
+  /* ---- horizontal list bars ---- */
+  .rows{display:flex;flex-direction:column;gap:8px}
+  .r{display:grid;grid-template-columns:130px 1fr auto;gap:10px;align-items:center;font-size:13px}
+  .r .k{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .r .track{height:12px;background:var(--panel2);border-radius:3px;overflow:hidden}
+  .r .track>i{display:block;height:100%;background:var(--sand-soft);border-radius:3px}
+  .r .v{font-family:"IBM Plex Mono",monospace;color:var(--dim);font-variant-numeric:tabular-nums;font-size:12.5px}
+
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:13px;color:var(--dim)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+  .callout{background:var(--panel2);border-left:3px solid var(--sand);border-radius:0 8px 8px 0;
+           padding:16px 18px;margin-top:22px;font-size:15px}
+  .callout b{color:var(--sand)}
+
+  table.clone{width:100%;border-collapse:collapse;margin-top:6px;font-size:13px}
+  table.clone td{padding:6px 8px;border-bottom:1px solid var(--line)}
+  table.clone td.num{font-family:"IBM Plex Mono",monospace;text-align:right;color:var(--sand);
+                     font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+  table.clone td.nm{color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:1px}
+
+  footer{padding:34px 0 60px;color:var(--dim);font-size:13px}
+  footer code{font-family:"IBM Plex Mono",monospace;background:var(--panel2);
+              padding:2px 6px;border-radius:4px;color:var(--ink)}
+  a{color:var(--sand)}
+  .toggle{position:fixed;top:14px;right:14px;background:var(--panel);border:1px solid var(--line);
+          color:var(--dim);border-radius:20px;padding:6px 13px;font-size:12px;cursor:pointer;
+          font-family:"IBM Plex Mono",monospace;z-index:9}
+</style>
+
+<button class="toggle" id="tg">◐ theme</button>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">A2S census · 10.09.2026</div>
+    <h1>CS 1.6<br>Server Census
+      <span class="thin">We polled the entire public list of Counter-Strike 1.6 servers over the
+      Valve A2S protocol. We found 112&nbsp;185 "servers" — and discovered that almost all of it is inflation.</span>
+    </h1>
+    <p class="lede">After 25 years the game hasn't died — but its "population" has long lived by the
+      rules of inflating trackers. <b>3738</b> real machines, <b>205</b> of which
+      use port farms to balloon the count into the hundreds of thousands. Below is what's really going on.</p>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">What's in the dataset</div>
+    <h2>Raw survey numbers</h2>
+    <p class="sub">This many addresses answered over A2S. At first glance — a huge, living
+      scene. Every number below is honest, but, as it turns out, misleading.</p>
+    <div class="tiles">
+      <div class="tile hot"><div class="n" data-v="112185"></div><div class="l">answered as CS 1.6</div></div>
+      <div class="tile"><div class="n" data-v="3738"></div><div class="l">unique IPs (machines)</div></div>
+      <div class="tile"><div class="n" data-v="1705"></div><div class="l">/24 subnets</div></div>
+      <div class="tile"><div class="n" data-v="6178"></div><div class="l">non-Steam (pirated)</div></div>
+      <div class="tile hot"><div class="n" data-v="1489381"></div><div class="l">claimed online</div></div>
+      <div class="tile"><div class="n" data-v="5313998"></div><div class="l">total slots</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">The main story</div>
+    <h2>The inflation funnel</h2>
+    <p class="sub">From the raw number of addresses to how many truly independent
+      servers there are. Each step strips away one layer of inflation. Bar width is the share of the original 112&nbsp;185.</p>
+    <div class="funnel" id="funnel"></div>
+    <div class="callout">The one same name <b>"ROMANIA.FULLBOOST.RO V.I.P FREE"</b> showed up
+      <b>3929</b> times — one server cloned across 3929 ports. Counting that as three thousand
+      servers is exactly the mistake public trackers make.</div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Concentration</div>
+    <h2>205 addresses against everyone else</h2>
+    <p class="sub">A port farm is a single machine answering A2S on dozens and hundreds of ports.
+      Just 205 such IPs hold 94% of all records in the dataset.</p>
+    <div class="grid2">
+      <div class="card">
+        <h3>Where the 112 185 servers "live"</h3>
+        <div class="note">records by IP type</div>
+        <div id="concentration"></div>
+        <div class="legend">
+          <span><i class="dot" style="background:var(--fake)"></i>205 port farms → 105 708</span>
+          <span><i class="dot" style="background:var(--real)"></i>3533 ordinary IPs → 6 477</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Top port farms: one name — hundreds of ports</h3>
+        <div class="note">how many times a server name repeats</div>
+        <table class="clone" id="clones"></table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Testing the living</div>
+    <h2>There's an online count — but what kind?</h2>
+    <p class="sub">A check via a repeat A2S_PLAYERS measurement: for real players in-game time grows
+      by the elapsed interval, while for fake bots the list stays frozen in place. Sample of 400 servers.</p>
+    <div class="grid2">
+      <div class="card">
+        <h3>Verdicts of the repeat measurement</h3>
+        <div class="note">400 non-empty servers, 70-second interval</div>
+        <div id="fakebar"></div>
+        <div class="legend">
+          <span><i class="dot" style="background:var(--real)"></i>alive 76%</span>
+          <span><i class="dot" style="background:var(--fake)"></i>inflated 14%</span>
+          <span><i class="dot" style="background:var(--suspect)"></i>suspicious 8%</span>
+          <span><i class="dot" style="background:var(--dim)"></i>no data 2%</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Claimed vs confirmed</h3>
+        <div class="note">online, millions/thousands of players — logarithmic difference</div>
+        <div id="onlinebar"></div>
+        <p class="note" style="margin-top:14px;margin-bottom:0">The claimed <b>1.49M</b> is a fiction
+          of the port farms. Outside the farms, where the count is plausible, only
+          <b>37K</b> is confirmed name by name. The real population of CS 1.6 is tens of thousands, not millions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">What people play</div>
+    <h2>Maps and modes</h2>
+    <p class="sub">By number of servers. de_dust2 — still the absolute champion, 25 years on.</p>
+    <div class="grid2">
+      <div class="card">
+        <h3>Top maps</h3>
+        <div class="note">servers running this map</div>
+        <div class="rows" id="maps"></div>
+      </div>
+      <div class="card">
+        <h3>Server themes</h3>
+        <div class="note">by keyword in the name</div>
+        <div class="rows" id="brands"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Data collected with the <a href="https://github.com/">cs16-stats</a> tool — a survey over the
+    Valve A2S protocol (only public data that a server hands to the server browser).
+    The honest-counting method: a port farm = an IP with more than 20 servers; "confirmed online" =
+    a name-by-name <code>A2S_PLAYERS</code> check with a repeat measurement. Full code and dataset — in the repository.
+  </div>
+</footer>
+
+<script>
+const fmt = n => n.toLocaleString('ru-RU');
+
+// counter numbers
+document.querySelectorAll('.n[data-v]').forEach(el=>{
+  el.textContent = fmt(+el.dataset.v);
+});
+
+// --- funnel ---
+const F = [
+  ['Answered over A2S', 112185, 'var(--dim)'],
+  ['Unique (IP, name)', 45185, 'var(--sand-soft)'],
+  ['Unique names', 13622, 'var(--sand)'],
+  ['Outside port farms', 6477, 'var(--real)'],
+  ['Real machines (IPs)', 3738, 'var(--real)'],
+];
+const fmax = F[0][1];
+document.getElementById('funnel').innerHTML = F.map(([k,v,c])=>`
+  <div class="frow">
+    <div class="cap">${k}<br><b class="mono">${fmt(v)}</b></div>
+    <div class="bar"><i style="width:${Math.max(6,v/fmax*100)}%;background:${c}">${fmt(v)}</i></div>
+  </div>`).join('');
+
+// --- concentration: stacked bar ---
+document.getElementById('concentration').innerHTML = (()=>{
+  const farm=105708, norm=6477, tot=farm+norm;
+  return `<div style="height:46px;display:flex;border-radius:8px;overflow:hidden;border:1px solid var(--line)">
+    <div style="width:${farm/tot*100}%;background:var(--fake);color:#fff;display:flex;align-items:center;
+      justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:14px">94%</div>
+    <div style="width:${norm/tot*100}%;background:var(--real)"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:12.5px;color:var(--dim)"
+    class="mono"><span>105 708 records on farms</span><span>6 477</span></div>`;
+})();
+
+// --- clones ---
+const C = [["ROMANIA.FULLBOOST.RO V.I.P FREE",3929],["CS 1.6 CLASSIC | 1000 FPS | 24/7",712],
+  ["DUST2 ARENA | SKINS + FREE VIP",711],["FAST ROUNDS | DUST2 NON-STOP",710],
+  ["PLAY HARD | RANK UP | HAVE FUN",709],["FULL ACTION | INSTANT CONNECT",708],
+  ["THE BEST DUST2 EXPERIENCE",707],["ENTER THE GAME | CLIMB THE RANK",707]];
+document.getElementById('clones').innerHTML = C.map(([n,v])=>
+  `<tr><td class="nm" title="${n}">${n}</td><td class="num">×${fmt(v)}</td></tr>`).join('');
+
+// --- fake bar (stacked) ---
+document.getElementById('fakebar').innerHTML = (()=>{
+  const seg=[[303,'var(--real)'],[56,'var(--fake)'],[33,'var(--suspect)'],[8,'var(--dim)']];
+  const tot=400;
+  return `<div style="height:42px;display:flex;border-radius:8px;overflow:hidden;border:1px solid var(--line)">`+
+    seg.map(([v,c])=>`<div style="width:${v/tot*100}%;background:${c}"></div>`).join('')+`</div>`;
+})();
+
+// --- claimed vs confirmed (log scale) ---
+document.getElementById('onlinebar').innerHTML = (()=>{
+  const rows=[['Claimed (total)',1489381,'var(--fake)'],
+              ['Confirmed via A2S_PLAYERS',820208,'var(--suspect)'],
+              ['Outside farms, claimed',39462,'var(--dim)'],
+              ['Outside farms, confirmed',36641,'var(--real)']];
+  const lg=v=>Math.log10(v); const mn=lg(30000),mx=lg(1489381);
+  return `<div class="rows">`+rows.map(([k,v,c])=>`
+    <div class="r"><div class="k">${k}</div>
+      <div class="track"><i style="width:${Math.max(8,(lg(v)-mn)/(mx-mn)*100)}%;background:${c}"></i></div>
+      <div class="v">${fmt(v)}</div></div>`).join('')+`</div>`;
+})();
+
+// --- maps (strip \r and dupes) ---
+const rawMaps = [["de_dust2",17051],["de_inferno",5233],["de_dust",4102],["fy_snow",3739],
+  ["awp_india",3600],["cs_deagle",3362],["de_tuscan32",2979],["de_nuke",1364],
+  ["de_train",1250],["de_aztec",1039]];
+(function(){
+  const m={}; rawMaps.forEach(([k,v])=>{k=k.trim();m[k]=(m[k]||0)+v;});
+  const arr=Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,9);
+  const mx=arr[0][1];
+  document.getElementById('maps').innerHTML=arr.map(([k,v])=>`
+    <div class="r"><div class="k">${k}</div>
+      <div class="track"><i style="width:${v/mx*100}%"></i></div>
+      <div class="v">${fmt(v)}</div></div>`).join('');
+})();
+
+// --- themes ---
+const B=[["DUST2",6066],["PUBLIC",4137],["CLASSIC",3968],["ZOMBIE",3712],["DEATHMATCH",2473],
+  ["GUNGAME",2382],["JAILBREAK",1225],["SURF",1054],["DEATHRUN",759]];
+(function(){const mx=B[0][1];
+  document.getElementById('brands').innerHTML=B.map(([k,v])=>`
+    <div class="r"><div class="k">${k}</div>
+      <div class="track"><i style="width:${v/mx*100}%"></i></div>
+      <div class="v">${fmt(v)}</div></div>`).join('');})();
+
+// --- theme toggle ---
+const root=document.documentElement;
+document.getElementById('tg').onclick=()=>{
+  const cur=root.getAttribute('data-theme');
+  const sysDark=matchMedia('(prefers-color-scheme:dark)').matches;
+  const now = cur ? cur : (sysDark?'dark':'light');
+  root.setAttribute('data-theme', now==='dark'?'light':'dark');
+};
+</script>

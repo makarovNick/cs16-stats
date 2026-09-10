@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# working logs and temporary run files
+logs_*.txt
+server.log
+nohup.out
+
+# harvest/ — raw intermediate dumps from collectors and sweeps (gigabytes of junk,
+# the important parts are exported to data/ by the export_data.py script). We commit
+# clean slices to the repo, not the raw material.
+harvest/
+
+# housekeeping
+*.tmp
+.DS_Store
+Thumbs.db
+
+# raw database (208 MB) — we commit data/cs16.db.gz to the repo
+cs16.db
+*.db
+
+# working junk from agents and recon (not for publication)
+tmp_cis/
+_*.py
+_*.txt
+qa_*.py
+geo.py
+*.alive.txt
+logs_*.txt
